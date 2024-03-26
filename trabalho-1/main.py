@@ -5,8 +5,6 @@ from tkinter import *
 JANELA_LARGURA = 1024
 JANELA_ALTURA = 576
 
-# TODO: Escolher resolucao ao iniciar (outra janela com opcoes?)
-
 # Constantes para o canvas
 CANVAS_LARGURA = JANELA_LARGURA
 CANVAS_ALTURA = JANELA_ALTURA

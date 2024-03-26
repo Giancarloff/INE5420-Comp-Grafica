@@ -15,7 +15,6 @@ class App:
 
         # XXX: Gambiarra
         self.coords_inicio_nav = None
-        self.usando_zoom_alt = False
 
     @property
     def tk_root(self) -> Tk:
@@ -36,16 +35,13 @@ class App:
     def iniciar(self):
         
         # Interações pelo canvas
-        self.canvas.bind("<MouseWheel>", self.zoom)
-        self.canvas.bind("<Alt-ButtonPress-1>", self.zoom_alt_inicio)
-        self.canvas.bind("<Alt-B1-Motion>", self.zoom_alt)
+        # self.canvas.bind("<MouseWheel>", self.zoom)
         self.canvas.bind("<ButtonPress-1>", self.inicio_navegacao)
         self.canvas.bind("<B1-Motion>", self.navegar)
         self.canvas.bind("<ButtonRelease-1>", self.fim_navegacao)
         self.canvas.bind("<Button-3>", self.mostrar_menu)
 
         self.canvas.pack()
-
         self.tk_root.mainloop()
 
     def mostrar_menu(self, evento: Event):
@@ -68,27 +64,8 @@ class App:
 
         self.menu.post(evento.x_root, evento.y_root)
 
-    def zoom_alt_inicio(self, evento: Event):
-        self.usando_zoom_alt = True
-        self.coords_zoom_inicial = evento.x
-
-    def zoom_alt(self, evento: Event):
-        scale_factor = 1.1  # Adjust the scale factor as needed
-        if evento.x - self.coords_zoom_inicial > 0:  # Zoom in
-            self.canvas.scale("all", evento.x, evento.y, scale_factor, scale_factor)
-        elif evento.x - self.coords_zoom_inicial < 0:  # Zoom out
-            self.canvas.scale("all", evento.x, evento.y, 1 / scale_factor, 1 / scale_factor)
-        
-
     def zoom(self, evento: Event):
-        scale_factor = 1.1  # Adjust the scale factor as needed
-        if evento.delta > 0:  # Zoom in
-            self.canvas.scale("all", evento.x, evento.y, scale_factor, scale_factor)
-        elif evento.delta < 0:  # Zoom out
-            self.canvas.scale("all", evento.x, evento.y, 1 / scale_factor, 1 / scale_factor)
-        
-        self.refresh()
-
+        print("ZOOM")
 
     def inicio_navegacao(self, evento: Event):
         self.coords_inicio_nav = (evento.x, evento.y)
@@ -137,9 +114,9 @@ class App:
             if isinstance(obj, Ponto):
                 px, py = obj.coordenadas
 
-                if (x - px)**2 + (y - py)**2 < 50:
+                if (x - px)**2 + (y - py)**2 < 75:
                     print(f"SELECIONOU {obj.nome}")
-                    self.canvas.create_text(15, 15, anchor="nw", text=f"Selecionado: {obj.nome}")
+                    self.canvas.create_text(15, 15, anchor="nw", text=f"Selecionado: {obj.nome}", fill="black")
                     self.refresh()
                     return obj  
 
@@ -159,7 +136,7 @@ class App:
             self.__ponto_fim = self.selecionar_ponto(evento.x, evento.y)
 
             if self.__ponto_inicio == self.__ponto_fim:
-                self.canvas.create_text(20, 20, anchor="nw", text="Selecione outro ponto!")
+                self.canvas.create_text(20, 20, anchor="nw", text="Selecione outro ponto!", fill="black")
                 self.__ponto_fim = None
                 self.refresh()
 
@@ -178,6 +155,8 @@ class App:
                 self.canvas.bind("<ButtonRelease-1>", self.fim_navegacao)
                 self.canvas.bind("<Button-3>", self.mostrar_menu)
 
+    def comecar_wireframe(self):
+        ...
 
     def adicionar_wireframe(self):
         print("WIREFRAM")
