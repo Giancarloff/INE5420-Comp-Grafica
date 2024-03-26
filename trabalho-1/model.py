@@ -59,6 +59,7 @@ class Ponto:
         coords_antigas = self.coordenadas
         self.__coordenadas = (self.coordenadas[0] + dx, self.coordenadas[1] + dy)
         del coords_antigas
+    
 
 class Reta:
     '''
@@ -72,13 +73,6 @@ class Reta:
     @property
     def pontos(self):
         return self.__pontos
-    
-    def __eq__(self, __value: object) -> bool:
-        eq = True
-        for (i, p) in enumerate(self.pontos):
-            if __value.pontos[i] != p: eq = False
-
-        return eq
 
 class Wireframe:
     '''
@@ -127,11 +121,16 @@ class DisplayFile:
         return ponto
     
     def nova_reta_2d(self, pontos: list[Ponto]):
-        for obj in self.objetos:
-            if self == obj: # __eq__ definido em Reta
-                return
-        
         self.__contador += 1
         reta = Reta(str(self.__contador), pontos)
+        for obj in self.objetos:
+            if isinstance(obj, Reta):
+                if not isinstance(obj.pontos, Ponto): # XXX: Não sei por que precisa desse if, mas não funciona de outra forma
+                    p1, p2 = obj.pontos
+                    r1, r2 = reta.pontos
+                    if p1 == p2 and r1 == r2:
+                        del reta
+                        return
+            
         self.objetos.append(reta)
         return reta

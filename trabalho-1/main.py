@@ -11,8 +11,6 @@ JANELA_ALTURA = 576
 CANVAS_LARGURA = JANELA_LARGURA
 CANVAS_ALTURA = JANELA_ALTURA
 
-# Objetos para o App
-
 # Raiz do Tkinter
 ROOT = Tk()
 ROOT.title("Sistema Básico de CG 2D")
