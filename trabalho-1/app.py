@@ -15,6 +15,7 @@ class App:
 
         # XXX: Gambiarra
         self.coords_inicio_nav = None
+        self.pontos_wireframe = None
 
     @property
     def tk_root(self) -> Tk:
@@ -59,7 +60,7 @@ class App:
         
         self.menu.add_command(
             label="Wireframe", 
-            command=self.adicionar_wireframe
+            command=self.comecar_wireframe
         )
 
         self.menu.post(evento.x_root, evento.y_root)
@@ -102,8 +103,6 @@ class App:
         self.canvas.unbind("<ButtonRelease-1>")
         self.canvas.unbind("<ButtonPress-3>")
 
-        self.canvas.create_text(10, 10, anchor="nw", text="Criando reta...")
-
         self.escolhendo_primeiro_ponto = True
         self.escolhendo_segundo_ponto = False
 
@@ -116,13 +115,13 @@ class App:
 
                 if (x - px)**2 + (y - py)**2 < 75:
                     print(f"SELECIONOU {obj.nome}")
-                    self.canvas.create_text(15, 15, anchor="nw", text=f"Selecionado: {obj.nome}", fill="black")
                     self.refresh()
+                    self.canvas.create_text(15, 25, anchor="nw", text=f"Selecionado: {obj.nome}", fill="black")
                     return obj  
 
         novo_ponto = self.display_file.novo_ponto_2d(x, y)
-        self.canvas.create_text(15, 15, anchor="nw", text=f"Novo ponto: {novo_ponto.nome}")
         self.refresh()
+        self.canvas.create_text(15, 25, anchor="nw", text=f"Novo ponto: {novo_ponto.nome}")
         print(f"CRIOU {novo_ponto.nome}")
         return novo_ponto
 
@@ -156,10 +155,39 @@ class App:
                 self.canvas.bind("<Button-3>", self.mostrar_menu)
 
     def comecar_wireframe(self):
-        ...
+        self.pontos_wireframe = list()
+        self.canvas.bind("<ButtonPress-1>", self.adicionar_wireframe)
 
-    def adicionar_wireframe(self):
-        print("WIREFRAM")
+        self.canvas.unbind("<B1-Motion>")
+        self.canvas.unbind("<ButtonRelease-1>")
+        self.canvas.unbind("<ButtonPress-3>")
+
+        self.canvas.create_text(10, 10, anchor="nw", text="Criando wireframe...", fill="black")
+        self.escolhendo_primeiro_ponto = True
+
+    def adicionar_wireframe(self, evento: Event):
+        if self.escolhendo_primeiro_ponto:
+            self.__ponto_inicio = self.selecionar_ponto(evento.x, evento.y)
+            self.pontos_wireframe.append(self.__ponto_inicio)
+            self.escolhendo_primeiro_ponto = False
+        else:
+            self.__ponto_atual = self.selecionar_ponto(evento.x, evento.y)
+            if self.__ponto_atual == self.__ponto_inicio:
+                self.display_file.novo_wireframe(self.pontos_wireframe)
+
+                self.__ponto_inicio = None
+                self.__ponto_atual = None
+
+                self.canvas.unbind("<ButtonPress-1>")
+
+                self.canvas.bind("<ButtonPress-1>", self.inicio_navegacao)
+                self.canvas.bind("<B1-Motion>", self.navegar)
+                self.canvas.bind("<ButtonRelease-1>", self.fim_navegacao)
+                self.canvas.bind("<Button-3>", self.mostrar_menu)
+
+                self.refresh()
+            else:
+                self.pontos_wireframe.append(self.__ponto_atual)
 
     def refresh(self):
 
@@ -177,5 +205,16 @@ class App:
                     x1, y1 = p1.coordenadas
                     x2, y2 = p2.coordenadas
                     self.canvas.create_line(x1, y1, x2, y2, fill="black")
+            elif isinstance(obj, Wireframe):
+                if not isinstance(obj.pontos, Ponto): # XXX: Idem ao caso da Reta
+                    mod = len(obj.pontos)
+                    for i, pontos in enumerate(obj.pontos):
+                        p1, p2 = obj.pontos[i], obj.pontos[(i + 1) %  mod]
+                        x1, y1 = p1.coordenadas
+                        x2, y2 = p2.coordenadas
+                        self.canvas.create_line(x1, y1, x2, y2, fill="black")
+
+        if self.escolhendo_primeiro_ponto:
+            self.canvas.create_text(10, 10, anchor="nw", text="Criando reta...", fill="black")
 
         self.canvas.pack()

@@ -1,0 +1,4 @@
+Para usar basta clicar com o botão direito no canvas.
+Para colocar uma reta, escolha a opção no menu e selecione (ou crie) os pontos.
+Wireframe é análogo a reta, você deve ir selecionando/criando pontos até voltar ao original.
+Zoom não implementado.

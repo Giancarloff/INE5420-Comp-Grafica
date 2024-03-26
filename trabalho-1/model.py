@@ -46,15 +46,6 @@ class Ponto:
     def nome(self):
         return self.__nome
 
-    def coordenada_em(self, eixo: int) -> float:
-        '''
-        Qual o valor da coordenada deste ponto no eixo dado. 
-        '''
-        if (eixo < self.dimensao):
-            return self.__coordenadas
-        else:
-            raise IndexError(f"Esse ponto não tem coordenada no eixo {eixo}.")
-
     def mover(self, dx, dy):
         coords_antigas = self.coordenadas
         self.__coordenadas = (self.coordenadas[0] + dx, self.coordenadas[1] + dy)
@@ -78,18 +69,13 @@ class Wireframe:
     '''
     Pontos com retas traçadas entre eles
     '''
-    def __init__(self, nome: str, pontos: list[Ponto], retas: dict) -> None:
+    def __init__(self, nome: str, pontos: list[Ponto]) -> None:
         self.__pontos = pontos
-        self.__retas = retas
         self.__nome = nome
 
     @property
     def pontos(self):
         return self.__pontos
-    
-    @property
-    def retas(self):
-        return self.__retas
     
     @property
     def nome(self):
@@ -134,3 +120,10 @@ class DisplayFile:
             
         self.objetos.append(reta)
         return reta
+    
+    def novo_wireframe(self, pontos: list[Ponto]) -> Wireframe:
+        self.__contador += 1
+        wireframe = Wireframe(str(self.__contador), pontos)
+
+        self.objetos.append(wireframe)
+        return wireframe
